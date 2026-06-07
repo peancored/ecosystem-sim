@@ -8,6 +8,7 @@ import {
 } from './rabbit-stats.js';
 import RabbitPopulation from './rabbits-population/index.js';
 import initSpeedControl from './speed-control.js';
+import WolvesPopulation from './wolves-population/index.js';
 
 class Game {
 	constructor() {
@@ -66,6 +67,11 @@ class Game {
 			this.foodSources,
 			this.global
 		);
+		this.wolvesPopulation = new WolvesPopulation(
+			this.gl,
+			this.mProjection,
+			this.environment
+		);
 
 		this.stats = new Stats();
 		this.stats.showPanel(0);
@@ -82,6 +88,7 @@ class Game {
 		await this.environment.loading;
 		await this.foodSources.loading;
 		await this.rabbitsPopulation.loading;
+		await this.wolvesPopulation.loading;
 
 		this.canvas.addEventListener('mousedown', (event) => {
 			const rabbit = this.rabbitsPopulation.getRabbitAt(
@@ -107,16 +114,13 @@ class Game {
 
 		// requestAnimationFrame(this.draw.bind(this));
 		//
-		this.limitFps(144);
+		this.limitFps(30);
 	}
 
 	draw(now) {
 		if (!this.frameEndTime) {
 			this.frameEndTime = now;
 		}
-		// if (this.global.timeFromStart > 1000) {
-		// this.global.timeFromStart = 0;
-		// }
 
 		this.global.deltaTime = (now - this.frameEndTime) / 1000;
 
@@ -135,9 +139,11 @@ class Game {
 		this.stats.begin();
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
+		this.environment.updateTime(this.global.timeFromStart);
 		this.environment.draw();
 		this.rabbitsPopulation.draw();
 		this.foodSources.draw();
+		// this.wolvesPopulation.draw();
 
 		updateStats(this.highlightedRabbit);
 		updateGlobalStats(this.rabbitsPopulation.rabbits.length);
@@ -173,11 +179,11 @@ const game = new Game();
 const playButton = document.getElementById('play-button');
 const underlay = document.getElementById('underlay');
 
-playButton.addEventListener('click', () => {
+// playButton.addEventListener('click', () => {
 	playButton.style.display = 'none';
 	underlay.style.display = 'flex';
-	setTimeout(() => {
+	// setTimeout(() => {
 		initSpeedControl();
 		game.start();
-	}, 30);
-});
+	// }, 30);
+// });

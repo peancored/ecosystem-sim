@@ -29,8 +29,8 @@ export default class Environment extends GLProgram {
 		});
 	}
 
-	async assignTextureToUniform() {
-		const { registry } = await this.loadTexture(this.generateImage());
+	assignTextureToUniform() {
+		const registry = this.bindTextureFromCanvas(this.generateImage());
 
 		this.gl.useProgram(this.program);
 		this.gl.bindVertexArray(this.vao);
@@ -181,7 +181,7 @@ export default class Environment extends GLProgram {
 			}
 		}
 
-		return canvas.toDataURL('image/png');
+		return canvas;
 	}
 
 	getRandomGroundTile() {
@@ -419,5 +419,51 @@ export default class Environment extends GLProgram {
 		}
 
 		return null;
+	}
+
+	bindTextureFromCanvas(canvas) {
+		const texture = this.gl.createTexture();
+		const textureRegistry = global.nextTextureRegistry;
+
+		this.gl.activeTexture(this.gl.TEXTURE0 + textureRegistry);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+
+		this.gl.texParameteri(
+			this.gl.TEXTURE_2D,
+			this.gl.TEXTURE_WRAP_S,
+			this.gl.CLAMP_TO_EDGE
+		);
+		this.gl.texParameteri(
+			this.gl.TEXTURE_2D,
+			this.gl.TEXTURE_WRAP_T,
+			this.gl.CLAMP_TO_EDGE
+		);
+		this.gl.texParameteri(
+			this.gl.TEXTURE_2D,
+			this.gl.TEXTURE_MIN_FILTER,
+			this.gl.NEAREST
+		);
+		this.gl.texParameteri(
+			this.gl.TEXTURE_2D,
+			this.gl.TEXTURE_MAG_FILTER,
+			this.gl.NEAREST
+		);
+
+		const mipLevel = 0;
+		const internalFormat = this.gl.RGBA;
+		const srcFormat = this.gl.RGBA;
+		const srcType = this.gl.UNSIGNED_BYTE;
+		this.gl.texImage2D(
+			this.gl.TEXTURE_2D,
+			mipLevel,
+			internalFormat,
+			srcFormat,
+			srcType,
+			canvas
+		);
+
+		global.nextTextureRegistry += 1;
+
+		return textureRegistry;
 	}
 }

@@ -40,12 +40,12 @@ export default class GLProgram {
 		this.gl.uniform1f(this.timeLocation, time);
 	}
 
-	loadTexture(src) {
+	loadTexture(src, uniformName) {
 		return new Promise((resolve) => {
 			const image = new Image();
 			image.src = src;
 			image.onload = function () {
-				resolve({ registry: this.bindTexture(image) });
+				resolve({ registry: this.bindTexture(image, uniformName) });
 			}.bind(this);
 		});
 	}

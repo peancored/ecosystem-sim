@@ -220,15 +220,6 @@ export default class Movable {
 				Math.floor(this.state.position[1])
 			)
 		) {
-			// console.log(nextPosition);
-			// if (!this.state.highlighted) {
-			// this.state.highlighted = 1;
-			// setTimeout(() => {
-			// this;
-			// nextPosition;
-			// debugger;
-			// }, 40);
-			// }
 			this.die(DEATH_REASONS.DRAWN);
 		}
 	}

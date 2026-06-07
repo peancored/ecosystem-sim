@@ -83,5 +83,9 @@ export function scaleByDeltaTime(value) {
 		return value;
 	}
 
-	return (global.speedUpFactor * (value * global.deltaTime)) / (1 / 144);
+	if (global.speedUpFactor < 20) {
+		return (global.speedUpFactor * (value * global.deltaTime)) / (1 / 144);
+	}
+
+	return global.speedUpFactor * value;
 }
